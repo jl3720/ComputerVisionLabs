@@ -28,6 +28,8 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     # TODO: implement the computation of the image gradients Ix and Iy here.
     # You may refer to scipy.signal.convolve2d for the convolution.
     # Do not forget to use the mode "same" to keep the image size unchanged.
+
+    PLOT = False  # Flag to generate report figures
     
     # Generate approx gradient masks and convolve w/ img
     hx = np.array([[0, 0, 0], [-1, 0, 1], [0, 0, 0]]) / 2.  # Naive horizontal gradient mask
@@ -121,11 +123,20 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     trace = M11 + M22
     C = detM - k*trace**2
 
+    # Set response at borders of img to 0
+    BORDER = 5
+    C[:BORDER, :] = 0  # Top edge
+    C[-BORDER:, :] = 0  # Bottom edge
+    C[:, :BORDER] = 0  # Left edge
+    C[:, -BORDER:] = 0  # Right edge
+
     print(f"C size: {C.shape}")
+
+    # Delete
 
     plt.figure()
     # Note extreme gradients at edges in partials => extremes at corners. Crop edges for visualisation.
-    plt.imshow(C[10:246, 10:246], cmap="gray")
+    plt.imshow(C, cmap="gray")
     plt.title("Harris response")
     plt.axis("off")
     plt.colorbar()
@@ -157,7 +168,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     suppressed[C > thresh] = C[C > thresh]
 
     plt.figure()
-    plt.imshow(suppressed[5: 251, 5: 251], cmap="gray")
+    plt.imshow(suppressed, cmap="gray")
     plt.title("Suppressed sub-threshold response")
     plt.colorbar()
 
@@ -168,7 +179,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
 
     # corners = ndimage.maximum_filter(thresholded_response, size=(3,3))
     plt.figure()
-    plt.imshow(corners[5: 251, 5: 251], cmap="gray")
+    plt.imshow(corners, cmap="gray")
     plt.title("Corners after non-max suppresion")
     plt.axis("off")
     plt.colorbar()
@@ -177,12 +188,23 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
 
     # binary image of corners
     plt.figure()
-    plt.imshow(corners[5: 251, 5: 251] > thresh, cmap="gray")
+    plt.imshow(corners > thresh, cmap="gray")
     plt.title("Binary image of corners after non-max suppresion")
     plt.axis("off")
     plt.colorbar()
-    plt.show()
 
+    if PLOT:
+        plt.show()
 
+    # `corners` should be indices not harris response
+    # N.B. opencv images are (m, n) but vis tools use (x, y) convention
+    corners = np.stack(np.where(corners > thresh), axis=1)  # (num_corners, 2)
+    print("shape:", np.shape(corners))
+    corners_swapped = []
+    for idxs in corners:
+        m, n = idxs
+        corners_swapped.append((n,m))
+
+    corners = np.array(corners_swapped)
     return corners, C
 
