@@ -7,6 +7,8 @@ import cv2
 import matplotlib.pyplot as plt  # debug
 from matplotlib import colors
 
+from copy import deepcopy
+
 # Harris corner detector
 def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     '''
@@ -136,23 +138,51 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     # You may refer to np.where to find coordinates of points that fulfill some condition; Please, pay attention to the order of the coordinates.
     # You may refer to np.stack to stack the coordinates to the correct output format
 
+    # Generate binary image of corner candidates
     thresholded_response = C > thresh
     plt.figure()
     plt.imshow(thresholded_response, cmap="gray")
     plt.title("Thresholded Response")
     plt.axis("off")
+    plt.colorbar()
     # plt.show()
 
-    corners = ndimage.maximum_filter(thresholded_response, size=(3,3))
+    # Get locations of sub-threshold harris reponse
+    non_candidates = np.stack(np.where(C < thresh), axis=0)  # (357, 2) array containing indices of non corner candidates
+    print(f"candidates type {type(non_candidates)}, size: {np.shape(non_candidates)}")
+    print(np.array(non_candidates)[:,0])
+
+    # Set non candidate Harris Response to 0 (avoid spurious maxima)
+    suppressed = np.zeros((256, 256))
+    suppressed[C > thresh] = C[C > thresh]
+
     plt.figure()
-    plt.imshow(corners, cmap="gray")
+    plt.imshow(suppressed[5: 251, 5: 251], cmap="gray")
+    plt.title("Suppressed sub-threshold response")
+    plt.colorbar()
+
+    # Perform non-max suppresion
+    response_max = ndimage.maximum_filter(suppressed, size=(3,3))
+    mask = suppressed == response_max  # Mask to select pixels that were the max in neighbourhood
+    corners = suppressed * mask
+
+    # corners = ndimage.maximum_filter(thresholded_response, size=(3,3))
+    plt.figure()
+    plt.imshow(corners[5: 251, 5: 251], cmap="gray")
     plt.title("Corners after non-max suppresion")
     plt.axis("off")
+    plt.colorbar()
+    # plt.show()
+
+
+    # binary image of corners
+    plt.figure()
+    plt.imshow(corners[5: 251, 5: 251] > thresh, cmap="gray")
+    plt.title("Binary image of corners after non-max suppresion")
+    plt.axis("off")
+    plt.colorbar()
     plt.show()
 
-    candidates = np.where(thresholded_response)  # (2, 357) array containing indices of corner candidates
-    print(f"candidates type {type(candidates)}, size: {np.shape(candidates)}")
-    print(np.array(candidates)[:,0])
 
     return corners, C
 
