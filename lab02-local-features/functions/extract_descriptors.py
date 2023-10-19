@@ -8,8 +8,16 @@ def filter_keypoints(img, keypoints, patch_size = 9):
     - keypoints:    (q', 2) numpy array of keypoint locations [x, y] that are far enough from edges
     '''
     # TODO: Filter out keypoints that are too close to the edges
+    print(f"Unfiltered keypoints: {np.shape(keypoints)}")
+    H, W = np.shape(img)
+    pad = patch_size // 2
+    filtered_keypoints = []
 
-    raise NotImplementedError
+    for x, y in keypoints:
+        if not ((x < pad) or (x > (W-pad)) or (y < pad) or (y > (H-pad))):
+            filtered_keypoints.append([x, y])
+    print(f"filtered_keypoints shape: {np.shape(filtered_keypoints)}")
+    return np.array(filtered_keypoints)
 
 # The implementation of the patch extraction is already provided here
 def extract_patches(img, keypoints, patch_size = 9):

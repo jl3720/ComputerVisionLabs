@@ -11,7 +11,14 @@ def ssd(desc1, desc2):
     '''
     assert desc1.shape[1] == desc2.shape[1]
     # TODO: implement this function please
-    raise NotImplementedError
+    distances = np.zeros((desc1.shape[0], desc2.shape[0]))
+    for m, keypoint1 in enumerate(desc1):
+        for n, keypoint2 in enumerate(desc2):
+            diff = keypoint1 - keypoint2
+            distances[m, n] = np.transpose(diff) * diff
+    
+    return distances
+
 
 def match_descriptors(desc1, desc2, method = "one_way", ratio_thresh=0.5):
     '''
@@ -25,15 +32,22 @@ def match_descriptors(desc1, desc2, method = "one_way", ratio_thresh=0.5):
     assert desc1.shape[1] == desc2.shape[1]
     distances = ssd(desc1, desc2)
     q1, q2 = desc1.shape[0], desc2.shape[0]
-    matches = None
+    matches = np.array([])
     if method == "one_way": # Query the nearest neighbor for each keypoint in image 1
         # TODO: implement the one-way nearest neighbor matching here
         # You may refer to np.argmin to find the index of the minimum over any axis
-        raise NotImplementedError
+        for i, di in enumerate(distances):
+            j = np.argmin(di)
+            np.append(matches, [i, j])
     elif method == "mutual":
         # TODO: implement the mutual nearest neighbor matching here
         # You may refer to np.min to find the minimum over any axis
-        raise NotImplementedError
+        min_for_desc1 = np.argmin(distances, axis=1)
+        min_for_desc2 = np.argmin(distances, axis=0)
+
+        print(f"min for desc1 keypoints: {min_for_desc1}")
+        print(f"min for desc2 keypoints: {min_for_desc2}")
+
     elif method == "ratio":
         # TODO: implement the ratio test matching here
         # You may use np.partition(distances,2,axis=0)[:,1] to find the second smallest value over a row
