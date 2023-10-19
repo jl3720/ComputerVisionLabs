@@ -29,7 +29,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     # You may refer to scipy.signal.convolve2d for the convolution.
     # Do not forget to use the mode "same" to keep the image size unchanged.
 
-    PLOT = False  # Flag to generate report figures
+    PLOT = True  # Flag to generate report figures
     
     # Generate approx gradient masks and convolve w/ img
     hx = np.array([[0, 0, 0], [-1, 0, 1], [0, 0, 0]]) / 2.  # Naive horizontal gradient mask
@@ -39,7 +39,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     Iy = signal.convolve2d(img, hy, mode="same")
 
     # Visualise gradient fields
-    plt.figure()
+    plt.figure(1)
     plt.subplot(1,2,1)
     plt.imshow(Ix, cmap="gray")
     plt.title("Horizontal intensity gradients")
@@ -56,13 +56,11 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     # TODO: compute the blurred image gradients
     # You may refer to cv2.GaussianBlur for the gaussian filtering (border_type=cv2.BORDER_REPLICATE)
 
-    SIGMA = 1  # scale of blurring
-
-    blurred_Ix = cv2.GaussianBlur(src=Ix, ksize=(5, 5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
-    blurred_Iy = cv2.GaussianBlur(src=Iy, ksize=(5, 5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
+    blurred_Ix = cv2.GaussianBlur(src=Ix, ksize=(5, 5), sigmaX=sigma, borderType=cv2.BORDER_REPLICATE)
+    blurred_Iy = cv2.GaussianBlur(src=Iy, ksize=(5, 5), sigmaX=sigma, borderType=cv2.BORDER_REPLICATE)
     # blurred_img = cv2.GaussianBlur(src=img, ksize=(11, 11), sigmaX=10, borderType=cv2.BORDER_REPLICATE)
 
-    fig, (ax1, ax2) = plt.subplots(1,2)
+    fig, (ax1, ax2) = plt.subplots(1,2, num=2, clear=True)
     # plt.imshow(blurred_img, cmap='gray')
     ax1.imshow(blurred_Ix, cmap="gray")
     ax1.set_title("Blurred horizontal intensity gradients")
@@ -83,9 +81,9 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     Ixy = blurred_Ix * blurred_Iy
 
     # Sum over patch using additional gaussian blur after smoothing gradient
-    M11 = cv2.GaussianBlur(src=Ix2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
-    M22 = cv2.GaussianBlur(src=Iy2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
-    M12 = cv2.GaussianBlur(src=Ixy, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
+    M11 = cv2.GaussianBlur(src=Ix2, ksize=(5,5), sigmaX=sigma, borderType=cv2.BORDER_REPLICATE)
+    M22 = cv2.GaussianBlur(src=Iy2, ksize=(5,5), sigmaX=sigma, borderType=cv2.BORDER_REPLICATE)
+    M12 = cv2.GaussianBlur(src=Ixy, ksize=(5,5), sigmaX=sigma, borderType=cv2.BORDER_REPLICATE)
     M21 = M12
 
     # Sum over patch using standard gaussian blur w/o smoothing gradient
@@ -101,7 +99,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     # M12 = signal.convolve2d(Ixy, sum_mask, mode="same")
     # M21 = M12
 
-    fig, (ax1, ax2, ax3) = plt.subplots(1,3, sharex=True, sharey=True)
+    fig, (ax1, ax2, ax3) = plt.subplots(1,3, sharex=True, sharey=True, num=3, clear=True)
     fig.suptitle("2nd Moment Gradients")
     im1 = ax1.imshow(M11, cmap="gray")
     ax1.axis("off")
@@ -134,7 +132,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
 
     # Delete
 
-    plt.figure()
+    plt.figure(4)
     # Note extreme gradients at edges in partials => extremes at corners. Crop edges for visualisation.
     plt.imshow(C, cmap="gray")
     plt.title("Harris response")
@@ -151,7 +149,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
 
     # Generate binary image of corner candidates
     thresholded_response = C > thresh
-    plt.figure()
+    plt.figure(5)
     plt.imshow(thresholded_response, cmap="gray")
     plt.title("Thresholded Response")
     plt.axis("off")
@@ -164,10 +162,10 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     print(np.array(non_candidates)[:,0])
 
     # Set non candidate Harris Response to 0 (avoid spurious maxima)
-    suppressed = np.zeros((256, 256))
+    suppressed = np.zeros_like(C)
     suppressed[C > thresh] = C[C > thresh]
 
-    plt.figure()
+    plt.figure(6)
     plt.imshow(suppressed, cmap="gray")
     plt.title("Suppressed sub-threshold response")
     plt.colorbar()
@@ -178,7 +176,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     corners = suppressed * mask
 
     # corners = ndimage.maximum_filter(thresholded_response, size=(3,3))
-    plt.figure()
+    plt.figure(7)
     plt.imshow(corners, cmap="gray")
     plt.title("Corners after non-max suppresion")
     plt.axis("off")
@@ -187,7 +185,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
 
 
     # binary image of corners
-    plt.figure()
+    plt.figure(8)
     plt.imshow(corners > thresh, cmap="gray")
     plt.title("Binary image of corners after non-max suppresion")
     plt.axis("off")
@@ -195,6 +193,8 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
 
     if PLOT:
         plt.show()
+    else:
+        plt.close("all")
 
     # `corners` should be indices not harris response
     # N.B. opencv images are (m, n) but vis tools use (x, y) convention
