@@ -29,7 +29,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     # You may refer to scipy.signal.convolve2d for the convolution.
     # Do not forget to use the mode "same" to keep the image size unchanged.
 
-    PLOT = True  # Flag to generate report figures
+    PLOT = False  # Flag to generate report figures
     
     # Generate approx gradient masks and convolve w/ img
     hx = np.array([[0, 0, 0], [-1, 0, 1], [0, 0, 0]]) / 2.  # Naive horizontal gradient mask

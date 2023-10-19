@@ -13,10 +13,13 @@ def ssd(desc1, desc2):
     # TODO: implement this function please
     distances = np.zeros((desc1.shape[0], desc2.shape[0]))
     for m, keypoint1 in enumerate(desc1):
+        # print(f"keypoint shape: {keypoint1.shape}")
         for n, keypoint2 in enumerate(desc2):
             diff = keypoint1 - keypoint2
-            distances[m, n] = np.transpose(diff) * diff
-    
+            # print(f"diff, {np.shape(diff)}")
+            # print("transpose diff * diff, ", np.shape(np.transpose(diff) * diff), np.shape(np.dot(diff, diff)))
+            distances[m, n] = np.dot(diff, diff)
+    print(distances.shape)
     return distances
 
 
@@ -32,13 +35,15 @@ def match_descriptors(desc1, desc2, method = "one_way", ratio_thresh=0.5):
     assert desc1.shape[1] == desc2.shape[1]
     distances = ssd(desc1, desc2)
     q1, q2 = desc1.shape[0], desc2.shape[0]
-    matches = np.array([])
+    matches = []
     if method == "one_way": # Query the nearest neighbor for each keypoint in image 1
         # TODO: implement the one-way nearest neighbor matching here
         # You may refer to np.argmin to find the index of the minimum over any axis
         for i, di in enumerate(distances):
             j = np.argmin(di)
-            np.append(matches, [i, j])
+            matches.append(np.array([i, j]))
+        matches = np.array(matches)
+        print(f"one_way shape: {matches.shape}")
     elif method == "mutual":
         # TODO: implement the mutual nearest neighbor matching here
         # You may refer to np.min to find the minimum over any axis
