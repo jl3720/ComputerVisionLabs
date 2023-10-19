@@ -35,6 +35,7 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     Iy = signal.convolve2d(img, hy, mode="same")
 
     # Visualise gradient fields
+    plt.figure()
     plt.subplot(1,2,1)
     plt.imshow(Ix, cmap="gray")
     plt.title("Horizontal intensity gradients")
@@ -57,17 +58,15 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     blurred_Iy = cv2.GaussianBlur(src=Iy, ksize=(5, 5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
     # blurred_img = cv2.GaussianBlur(src=img, ksize=(11, 11), sigmaX=10, borderType=cv2.BORDER_REPLICATE)
 
-    plt.figure()
+    fig, (ax1, ax2) = plt.subplots(1,2)
     # plt.imshow(blurred_img, cmap='gray')
-    plt.subplot(1,2,1)
-    plt.imshow(blurred_Ix, cmap="gray")
-    plt.title("Blurred horizontal intensity gradients")
-    plt.axis("off")
+    ax1.imshow(blurred_Ix, cmap="gray")
+    ax1.set_title("Blurred horizontal intensity gradients")
+    ax1.axis("off")
 
-    plt.subplot(1,2,2)
-    plt.imshow(blurred_Iy, cmap="gray")
-    plt.title("Blurred vertical intensity gradients")
-    plt.axis("off")
+    ax2.imshow(blurred_Iy, cmap="gray")
+    ax2.set_title("Blurred vertical intensity gradients")
+    ax2.axis("off")
     
     # plt.show()
 
@@ -79,17 +78,17 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     Iy2 = blurred_Iy ** 2
     Ixy = blurred_Ix * blurred_Iy
 
-    # Sum over patch using additional gaussian blur (double blurring)
-    # M11 = cv2.GaussianBlur(src=Ix2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
-    # M22 = cv2.GaussianBlur(src=Iy2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
-    # M12 = cv2.GaussianBlur(src=Ixy, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
-    # M21 = M12
-
-    # Sum over patch using standard gaussian blur
-    M11 = cv2.GaussianBlur(src=Ix**2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
-    M22 = cv2.GaussianBlur(src=Iy**2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
-    M12 = cv2.GaussianBlur(src=Ix*Iy, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
+    # Sum over patch using additional gaussian blur after smoothing gradient
+    M11 = cv2.GaussianBlur(src=Ix2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
+    M22 = cv2.GaussianBlur(src=Iy2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
+    M12 = cv2.GaussianBlur(src=Ixy, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
     M21 = M12
+
+    # Sum over patch using standard gaussian blur w/o smoothing gradient
+    # M11 = cv2.GaussianBlur(src=Ix**2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
+    # M22 = cv2.GaussianBlur(src=Iy**2, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
+    # M12 = cv2.GaussianBlur(src=Ix*Iy, ksize=(5,5), sigmaX=SIGMA, borderType=cv2.BORDER_REPLICATE)
+    # M21 = M12
 
     # Simple sum of elements in patch, since gradients already smoothed. Results don't look good however.
     # sum_mask = np.ones((5,5))  # Elements in M are summed over patch
@@ -98,14 +97,19 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     # M12 = signal.convolve2d(Ixy, sum_mask, mode="same")
     # M21 = M12
 
-    plt.figure()
-    plt.axis("off")
-    plt.subplot(1,3,1)
-    plt.imshow(Ix2, cmap="gray")
-    plt.title("2nd Moment Gradients")
+    fig, (ax1, ax2, ax3) = plt.subplots(1,3, sharex=True, sharey=True)
+    fig.suptitle("2nd Moment Gradients")
+    im1 = ax1.imshow(M11, cmap="gray")
+    ax1.axis("off")
+    ax1.set_title("$I_{xx}$")
 
-    plt.subplot(1,3,2)
-    plt.imshow(M11, cmap="gray")
+    im2 = ax2.imshow(M12, cmap="gray")
+    ax2.axis("off")
+    ax2.set_title("$I_{xy}$")
+
+    im3 = ax3.imshow(M22, cmap="gray")
+    ax3.axis("off")
+    ax3.set_title("$I_{yy}$")
     
 
     # 4. Compute Harris response function C
@@ -118,18 +122,37 @@ def extract_harris(img, sigma = 1.0, k = 0.05, thresh = 1e-5):
     print(f"C size: {C.shape}")
 
     plt.figure()
-    plt.imshow(C[10:246, 10:246], cmap="gray", norm="linear")  # Note extreme gradients at edges in partials => extremes at corners
+    # Note extreme gradients at edges in partials => extremes at corners. Crop edges for visualisation.
+    plt.imshow(C[10:246, 10:246], cmap="gray")
     plt.title("Harris response")
     plt.axis("off")
     plt.colorbar()
 
-    plt.show()
+    # plt.show()
 
     # 5. Detection with threshold and non-maximum suppression
     # TODO: detection and find the corners here
     # For the non-maximum suppression, you may refer to scipy.ndimage.maximum_filter to check a 3x3 neighborhood.
     # You may refer to np.where to find coordinates of points that fulfill some condition; Please, pay attention to the order of the coordinates.
     # You may refer to np.stack to stack the coordinates to the correct output format
-    raise NotImplementedError
+
+    thresholded_response = C > thresh
+    plt.figure()
+    plt.imshow(thresholded_response, cmap="gray")
+    plt.title("Thresholded Response")
+    plt.axis("off")
+    # plt.show()
+
+    corners = ndimage.maximum_filter(thresholded_response, size=(3,3))
+    plt.figure()
+    plt.imshow(corners, cmap="gray")
+    plt.title("Corners after non-max suppresion")
+    plt.axis("off")
+    plt.show()
+
+    candidates = np.where(thresholded_response)  # (2, 357) array containing indices of corner candidates
+    print(f"candidates type {type(candidates)}, size: {np.shape(candidates)}")
+    print(np.array(candidates)[:,0])
+
     return corners, C
 
