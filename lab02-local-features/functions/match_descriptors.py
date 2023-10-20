@@ -47,11 +47,30 @@ def match_descriptors(desc1, desc2, method = "one_way", ratio_thresh=0.5):
     elif method == "mutual":
         # TODO: implement the mutual nearest neighbor matching here
         # You may refer to np.min to find the minimum over any axis
+
+        # Naive solution
+        # for i, di in enumerate(distances):
+        #     j = np.argmin(di)
+        #     reverse_match = np.argmin(distances)
+        #     matches.append(np.array([i, j]))
+        # matches = np.array(matches)
+
+
         min_for_desc1 = np.argmin(distances, axis=1)
         min_for_desc2 = np.argmin(distances, axis=0)
 
-        print(f"min for desc1 keypoints: {min_for_desc1}")
-        print(f"min for desc2 keypoints: {min_for_desc2}")
+        # print(f"min for desc1 keypoints: {min_for_desc1}")
+        # print(f"min for desc2 keypoints: {min_for_desc2}")
+        
+        matches = []
+
+        for i, min_j in enumerate(min_for_desc1):
+            if i == min_for_desc2[min_j]:
+                matches.append([i, min_j])
+        
+        matches = np.asarray(matches)
+        print(f"matches: {matches.shape}")
+        
 
     elif method == "ratio":
         # TODO: implement the ratio test matching here
