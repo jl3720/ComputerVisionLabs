@@ -61,7 +61,7 @@ def match_descriptors(desc1, desc2, method = "one_way", ratio_thresh=0.5):
 
         # print(f"min for desc1 keypoints: {min_for_desc1}")
         # print(f"min for desc2 keypoints: {min_for_desc2}")
-        
+
         matches = []
 
         for i, min_j in enumerate(min_for_desc1):
@@ -75,7 +75,24 @@ def match_descriptors(desc1, desc2, method = "one_way", ratio_thresh=0.5):
     elif method == "ratio":
         # TODO: implement the ratio test matching here
         # You may use np.partition(distances,2,axis=0)[:,1] to find the second smallest value over a row
-        raise NotImplementedError
+        # for i, row in enumerate(distances):
+        second_smallest = np.partition(distances,2,axis=0)[:,1]
+        print(f"second_smallest: {second_smallest}, shape: {second_smallest.shape}")
+
+        smallest = np.min(distances, axis=1)
+
+        ratio = smallest / second_smallest
+        mask = ratio < ratio_thresh
+        print(f"mask: {mask}\nmask shape: {mask.shape}")
+
+        min_for_desc1 = np.argmin(distances, axis=1)
+        print(f"min for desc1 keypoints shape: {min_for_desc1.shape}")
+
+        unmasked_matches = np.array([(i, j) for i, j in enumerate(min_for_desc1)])
+        matches = unmasked_matches[mask]
+        print(f"matches: {matches}, matches shape: {matches.shape}")
+
+
     else:
         raise NotImplementedError
     return matches
