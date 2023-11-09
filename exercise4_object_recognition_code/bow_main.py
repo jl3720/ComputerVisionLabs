@@ -99,12 +99,18 @@ def descriptors_hog(img, vPoints, cellWidth, cellHeight):
                 patch_y = grad_y[start_y:end_y, start_x:end_x]
                 patch_x = grad_x[start_y:end_y, start_x:end_x]
 
-                # Orientations for each pixel in cell
-                orientations = np.arctan2(patch_y, patch_x) * (180/np.pi)
+                # Orientations for each pixel in cell, from 0 to 360 degrees
+                orientations = np.arctan2(patch_y, patch_x) * (180/np.pi) + 180
                 # print(f"orientations: {orientations.shape}, should be 4x4")
+                # print(f"max orientations: {np.max(orientations)}")
+                # print(f"min orientations: {np.min(orientations)}")
+
+                # Ensure dominant orientation is at 0 degrees
+                dominant_orientation = np.mean(orientations)
+                orientations_shifted = (orientations - dominant_orientation) % 360
 
                 # Compute histogram of orientations
-                hist, bin_edges = np.histogram(orientations, bins=nBins)
+                hist, bin_edges = np.histogram(orientations_shifted, bins=nBins)
                 desc.append(hist)
 
         desc = np.array(desc).flatten()
