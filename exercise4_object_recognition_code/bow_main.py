@@ -59,7 +59,7 @@ def grid_points(img, nPointsX, nPointsY, border):
             y = int(border + i * y_spacing)
             vPoints.append((x, y))
 
-    return vPoints
+    return np.array(vPoints)
 
 
 def descriptors_hog(img, vPoints, cellWidth, cellHeight):
@@ -175,15 +175,29 @@ def bow_histogram(vFeatures, vCenters):
     :param vCenters: NxD matrix containing N cluster centers of dim. D
     :return: histo: N-dim. numpy vector containing the resulting BoW activation histogram.
     """
-    histo = None
-
     # todo
-    ...
+
+    # Get the number of cluster centers (N) and feature vectors (M)
+    num_centers = vCenters.shape[0]
+    num_features = vFeatures.shape[0]
+
+    # Initialize histogram with zeros
+    histo = np.zeros(num_centers)
+
+    # Assign each feature vector to the nearest cluster center
+    for i in range(num_features):
+        feature_vector = vFeatures[i, :]
+        
+        # Calculate euclidean distances
+        distances = np.linalg.norm(vCenters - feature_vector, axis=1)
+        
+        # Find the index of the nearest cluster center
+        nearest_center_index = np.argmin(distances)
+        
+        # Increment the corresponding bin in the histogram
+        histo[nearest_center_index] += 1
 
     return histo
-
-
-
 
 
 def create_bow_histograms(nameDir, vCenters):
@@ -209,8 +223,11 @@ def create_bow_histograms(nameDir, vCenters):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # [h, w]
 
         # todo
-        ...
-
+        vPoints = grid_points(img, nPointsX, nPointsY, border)
+        vFeatures = descriptors_hog(img, vPoints, cellWidth, cellHeight)  # [k, 128]
+        bow_histo = bow_histogram(vFeatures, vCenters)  # [k, ]
+        # print("img histo shape: ", bow_histo.shape)
+        vBoW.append(bow_histo)
 
     vBoW = np.asarray(vBoW)  # [n_imgs, k]
     return vBoW
@@ -229,7 +246,14 @@ def bow_recognition_nearest(histogram,vBoWPos,vBoWNeg):
 
     # Find the nearest neighbor in the positive and negative sets and decide based on this neighbor
     # todo
-    ...
+
+    DistPos = np.linalg.norm(vBoWPos-histogram, axis=1)  # norm([n_imgs, k], axis=1) -> [n_imgs,]
+    DistPos = np.min(DistPos)  # Take smallest distance
+
+    DistNeg = np.linalg.norm(vBoWNeg-histogram, axis=1)
+    DistNeg = np.min(DistNeg)
+
+    # print(f"DistPos: {DistPos, DistPos.shape}\nDistNeg: {DistNeg, DistNeg.shape}")
 
     if (DistPos < DistNeg):
         sLabel = 1
@@ -248,8 +272,8 @@ if __name__ == '__main__':
     nameDirNeg_test = 'data/data_bow/cars-testing-neg'
 
 
-    k = None  # todo
-    numiter = None  # todo
+    k = 10  # todo
+    numiter = 100  # todo
 
     print('creating codebook ...')
     vCenters = create_codebook(nameDirPos_train, nameDirNeg_train, k, numiter)
