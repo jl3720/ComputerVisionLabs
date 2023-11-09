@@ -150,8 +150,12 @@ def create_codebook(nameDirPos, nameDirNeg, k, numiter):
 
         # Collect local feature points for each image, and compute a descriptor for each local feature point
         # todo
-        ...
-
+        
+        # Get grid points
+        vPoints = grid_points(img, nPointsX, nPointsY, border)
+        # Compute descriptors
+        descriptors = descriptors_hog(img, vPoints, cellWidth, cellHeight)  # [num_descriptors, 128]
+        vFeatures.append(descriptors)
 
     vFeatures = np.asarray(vFeatures)  # [n_imgs, n_vPoints, 128]
     vFeatures = vFeatures.reshape(-1, vFeatures.shape[-1])  # [n_imgs*n_vPoints, 128]
