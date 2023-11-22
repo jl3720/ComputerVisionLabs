@@ -2,3 +2,8 @@ bandwidth, elapsed_time_s
 2.5, 398.60300946235657
 5.0, 389.4914207458496
 7.0, 386.55313444137573
+Elapsed time for mean-shift: 439.45999550819397
+Traceback (most recent call last):
+  File "/home/james/code/ComputerVision/lab05-image-segmentation/mean-shift/mean-shift.py", line 76, in <module>
+    result_image = colors[labels].reshape(shape)
+IndexError: index 273 is out of bounds for axis 0 with size 24
