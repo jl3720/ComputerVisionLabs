@@ -40,7 +40,12 @@ class SegNetLite(nn.Module):
         layers_conv_down = []
         layers_bn_down = []
         layers_pooling = []
-        raise NotImplementedError('Downsampling layers are not implemented!')
+        # raise NotImplementedError('Downsampling layers are not implemented!')
+        for i, out_channels in enumerate(down_filter_sizes):
+            layers_conv_down.append(nn.Conv2d(input_size, out_channels, kernel_sizes[i], padding=conv_paddings[i]))
+            layers_bn_down.append(nn.BatchNorm2d(out_channels))
+            layers_pooling.append(nn.MaxPool2d(pooling_kernel_sizes[i], stride=pooling_strides[i], return_indices=True))  # store indices for Unpooling
+            input_size = out_channels
 
         # Convert Python list to nn.ModuleList, so that PyTorch's autograd
         # package can track gradients and update parameters of these layers
@@ -56,7 +61,12 @@ class SegNetLite(nn.Module):
         layers_conv_up = []
         layers_bn_up = []
         layers_unpooling = []
-        raise NotImplementedError('Upsampling layers are not implemented!')
+        # raise NotImplementedError('Upsampling layers are not implemented!')
+        for i, out_channels in enumerate(up_filter_sizes):
+            layers_unpooling.append(nn.MaxUnpool2d(pooling_kernel_sizes[i], stride=pooling_strides[i]))
+            layers_conv_up.append(nn.Conv2d(input_size, out_channels, kernel_sizes[i], padding=conv_paddings[i]))
+            layers_bn_up.append(nn.BatchNorm2d(out_channels))
+            input_size = out_channels
 
         # Convert Python list to nn.ModuleList, so that PyTorch's autograd
         # can track gradients and update parameters of these layers
@@ -67,10 +77,13 @@ class SegNetLite(nn.Module):
         self.relu = nn.ReLU(True)
 
         # Implement a final 1x1 convolution to to get the logits of 11 classes (background + 10 digits)
-        raise NotImplementedError('Final convolution layer is not implemented!')
+        # raise NotImplementedError('Final convolution layer is not implemented!')
+        self.logits = nn.Conv2d(in_channels=input_size, out_channels=11, kernel_size=1, padding=0)
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
         raise NotImplementedError('Forward function not implemented!')
+
 
 
 def get_seg_net(**kwargs):
