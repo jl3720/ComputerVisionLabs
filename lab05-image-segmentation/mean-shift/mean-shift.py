@@ -44,7 +44,7 @@ def meanshift_step(X, bandwidth=2.5):
     return X
 
 def meanshift(X):
-    BANDWIDTH = 7.
+    BANDWIDTH = 5.0
     for _ in range(20):
         X = meanshift_step(X, BANDWIDTH)
     return X
