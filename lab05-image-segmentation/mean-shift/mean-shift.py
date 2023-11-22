@@ -6,16 +6,42 @@ from skimage import io, color
 from skimage.transform import rescale
 
 def distance(x, X):
-    raise NotImplementedError('distance function not implemented!')
+    """
+    Compute the distance between a given point and all other points
+    that are within a specific radius. Consider radius of +inf.
+    """
+    # X is an array of shape (N, 3), where N is the number of points
+    # x is a point of shape (3,)
+    # return an array of shape (N,) containing the distance between x and each point in X
+    return np.linalg.norm(X - x, axis=1)
 
 def gaussian(dist, bandwidth):
-    raise NotImplementedError('gaussian function not implemented!')
+    """
+    Compute the weights of points according to the distance computed
+    by the distance function.
+    """
+    # dist is an array of shape (N,) containing the distances between a point and all other points
+    # bandwidth is a scalar representing the bandwidth parameter
+    # return an array of shape (N,) containing the weights computed using the gaussian function
+    return np.exp(-0.5 * (dist / bandwidth) ** 2)
 
 def update_point(weight, X):
-    raise NotImplementedError('update_point function not implemented!')
+    """
+    Update the point position according to weights computed
+    from the gaussian function.
+    """
+    # weight is an array of shape (N,) containing the weights computed using the gaussian function
+    # X is an array of shape (N, 3) representing the points
+    # return the updated point position
+    return np.sum(weight[:, np.newaxis] * X, axis=0) / np.sum(weight)
 
 def meanshift_step(X, bandwidth=2.5):
-    raise NotImplementedError('meanshift_step function not implemented!')
+    # raise NotImplementedError('meanshift_step function not implemented!')
+    for i in range(X.shape[0]):
+        dist = distance(X[i], X)
+        weight = gaussian(dist, bandwidth)
+        X[i] = update_point(weight, X)
+    return X
 
 def meanshift(X):
     for _ in range(20):
@@ -29,6 +55,9 @@ image = rescale(io.imread('eth.jpg'), scale, channel_axis=-1)
 image_lab = color.rgb2lab(image)
 shape = image_lab.shape # record image shape
 image_lab = image_lab.reshape([-1, 3])  # flatten the image
+
+# print(shape)
+# print(image_lab.shape)
 
 # Run your mean-shift algorithm
 t = time.time()
