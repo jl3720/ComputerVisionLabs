@@ -82,8 +82,28 @@ class SegNetLite(nn.Module):
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
-        raise NotImplementedError('Forward function not implemented!')
+        # Downsample path
+        indices = []
+        for i in range(self.num_down_layers):
+            x = self.layers_conv_down[i](x)
+            x = self.layers_bn_down[i](x)
+            x = self.relu(x)
+            x, ind = self.layers_pooling[i](x)
+            indices.append(ind)
 
+        # Upsample path
+        for i in range(self.num_up_layers):
+            ind = indices.pop()  # start with last maxpooling indices
+            x = self.layers_unpooling[i](x, ind)
+            x = self.layers_conv_up[i](x)
+            x = self.layers_bn_up[i](x)
+            x = self.relu(x)
+
+        # Final convolution
+        x = self.logits(x)
+        x = self.softmax(x)
+
+        return x
 
 
 def get_seg_net(**kwargs):
