@@ -79,7 +79,7 @@ class SegNetLite(nn.Module):
         # Implement a final 1x1 convolution to to get the logits of 11 classes (background + 10 digits)
         # raise NotImplementedError('Final convolution layer is not implemented!')
         self.logits = nn.Conv2d(in_channels=input_size, out_channels=11, kernel_size=1, padding=0)
-        self.softmax = nn.Softmax(dim=1)
+        # self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
         # Downsample path
@@ -101,7 +101,7 @@ class SegNetLite(nn.Module):
 
         # Final convolution
         x = self.logits(x)
-        x = self.softmax(x)
+        # x = self.softmax(x)
 
         return x
 
