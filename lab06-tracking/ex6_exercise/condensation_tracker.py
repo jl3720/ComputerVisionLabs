@@ -7,7 +7,7 @@ from matplotlib import patches
 
 from color_histogram import color_histogram
 from propagate import propagate
-# from observe import observe
+from observe import observe
 # from resample import resample
 # from estimate import estimate
 
