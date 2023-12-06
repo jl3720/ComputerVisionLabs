@@ -6,11 +6,12 @@ from matplotlib.widgets import RectangleSelector
 from matplotlib import patches
 
 from color_histogram import color_histogram
-from propagate import propagate
-from observe import observe
-from resample import resample
-from estimate import estimate
+# from propagate import propagate
+# from observe import observe
+# from resample import resample
+# from estimate import estimate
 
+import pdb
 
 top_left = []
 bottom_right = []
@@ -96,6 +97,18 @@ def condensation_tracker(video_name, params):
     # === implement fuction color_histogram() ===
     hist = color_histogram(top_left[0], top_left[1], bottom_right[0], bottom_right[1],
                 first_image, params["hist_bin"])
+
+    # plt.close()
+    # fig, ax = plt.subplots(1,3)
+    # # Plot R,G,B histograms
+    # ax[0].bar(np.arange(params["hist_bin"]), hist[0:params["hist_bin"]])
+    # ax[1].bar(np.arange(params["hist_bin"]), hist[params["hist_bin"]:2*params["hist_bin"]])
+    # ax[2].bar(np.arange(params["hist_bin"]), hist[2*params["hist_bin"]:3*params["hist_bin"]])
+    # plt.show()
+    # r_sum = np.sum(hist[0:params["hist_bin"]])
+    # g_sum = np.sum(hist[params["hist_bin"]:2*params["hist_bin"]])
+    # b_sum = np.sum(hist[2*params["hist_bin"]:3*params["hist_bin"]])
+    # print("R sum: %f, G sum: %f, B sum: %f" % (r_sum, g_sum, b_sum))
     # ===========================================
 
     state_length = 2
