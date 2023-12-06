@@ -28,7 +28,7 @@ def observe(particles, frame, bbox_height, bbox_width,
         distance = chi2_cost(hist_roi, hist)
         
         # Compute the weight of the particle using the chi2 distance and sigma_observe
-        weight = np.exp(-distance / (2 * sigma_observe**2)) / (np.sqrt(2*np.pi) * sigma_observe)
+        weight = np.exp(-distance**2 / (2 * sigma_observe**2)) / (np.sqrt(2*np.pi) * sigma_observe)
 
         particles_w.append(weight)
     
