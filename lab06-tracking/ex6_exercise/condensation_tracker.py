@@ -6,7 +6,7 @@ from matplotlib.widgets import RectangleSelector
 from matplotlib import patches
 
 from color_histogram import color_histogram
-# from propagate import propagate
+from propagate import propagate
 # from observe import observe
 # from resample import resample
 # from estimate import estimate
@@ -139,6 +139,7 @@ def condensation_tracker(video_name, params):
         # Propagate particles
         # === Implement function propagate() ===
         particles = propagate(particles, frame_height, frame_width, params)
+        pdb.set_trace()
         # ======================================
 
         # Estimate
