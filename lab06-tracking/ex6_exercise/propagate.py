@@ -37,13 +37,13 @@ def propagate(particles, frame_height, frame_width, params):
 
     # Propagate particles: s_t = As_{t-1} + w_{t-1}
     # if params["model"] == 0:
-    #     particles = np.dot(A, particles.T).T + noise_position
+    #     propagated_particles = np.dot(A, particles.T).T + noise_position
     # elif params["model"] == 1:
-    #     particles = np.dot(A, particles.T).T + np.hstack((noise_position, noise_velocity))
+    #     propagated_particles = np.dot(A, particles.T).T + np.hstack((noise_position, noise_velocity))
     if params["model"] == 0:
-        propagated_particles = np.matmul(particles, A) + noise_position
+        propagated_particles = np.matmul(particles, A.T) + noise_position
     elif params["model"] == 1:
-        propagated_particles = np.matmul(particles, A) + np.hstack((noise_position, noise_velocity))
+        propagated_particles = np.matmul(particles, A.T) + np.hstack((noise_position, noise_velocity))
 
     print(f"particles propagated shape: {propagated_particles.shape}")
 
@@ -51,5 +51,5 @@ def propagate(particles, frame_height, frame_width, params):
     propagated_particles[:, 0] = np.clip(propagated_particles[:, 0], 0, frame_width - 1)
     propagated_particles[:, 1] = np.clip(propagated_particles[:, 1], 0, frame_height - 1)
 
-    return particles
+    return propagated_particles
     

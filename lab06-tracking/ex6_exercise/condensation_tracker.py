@@ -8,8 +8,8 @@ from matplotlib import patches
 from color_histogram import color_histogram
 from propagate import propagate
 from observe import observe
-# from resample import resample
-# from estimate import estimate
+from resample import resample
+from estimate import estimate
 
 import pdb
 
@@ -109,6 +109,7 @@ def condensation_tracker(video_name, params):
     # g_sum = np.sum(hist[params["hist_bin"]:2*params["hist_bin"]])
     # b_sum = np.sum(hist[2*params["hist_bin"]:3*params["hist_bin"]])
     # print("R sum: %f, G sum: %f, B sum: %f" % (r_sum, g_sum, b_sum))
+    # pdb.set_trace(header="histogram called")
     # ===========================================
 
     state_length = 2
@@ -129,9 +130,13 @@ def condensation_tracker(video_name, params):
     particles = np.tile(mean_state_a_priori[0], (params["num_particles"], 1))
     particles_w = np.ones([params["num_particles"], 1]) * 1./params["num_particles"]
 
+    print(f"Initial particles shape: {particles.shape}")
+    print(f"Initial particles_w shape: {particles_w.shape}")
+
     fig, ax = plt.subplots(1)
     im = ax.imshow(first_image)
     plt.ion()
+    # pdb.set_trace(header="2nd image called")
 
     for i in range(last_frame - first_frame + 1):
         t = i + first_frame
@@ -139,17 +144,21 @@ def condensation_tracker(video_name, params):
         # Propagate particles
         # === Implement function propagate() ===
         particles = propagate(particles, frame_height, frame_width, params)
-        pdb.set_trace()
+        print(f"new particles: {particles}")
         # ======================================
 
         # Estimate
         # === Implement function estimate() ===
         mean_state_a_priori[i, :] = estimate(particles, particles_w)
+        print(f"mean_state_a_priori: {mean_state_a_priori[i,:]}")
+
+        # pdb.set_trace(header="estimate called")
         # ======================================
 
         # Get frame
         ret, frame = vidcap.read()
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # pdb.set_trace(header="frame read in, in loop")
 
         # Draw
         if params["draw_plots"]:
@@ -182,9 +191,13 @@ def condensation_tracker(video_name, params):
         # === Implement function observe() ===
         particles_w = observe(particles, frame, bbox_height, bbox_width, params["hist_bin"], hist, params["sigma_observe"])
         # ====================================
+        print(f"particles_w: {particles_w}")
+        # pdb.set_trace(header="observe called")
 
         # Update estimation
         mean_state_a_posteriori[i, :] = estimate(particles, particles_w)
+        print(f"mean_state_a_posteriori: {mean_state_a_posteriori[i,:]}")
+        # pdb.set_trace(header="estimate called to update estimation \nAbout to call histogram")
 
         # Update histogram color model                   
         hist_crrent = color_histogram(min(max(0, round(mean_state_a_posteriori[i, 0]-0.5*bbox_width)), frame_width-1),
