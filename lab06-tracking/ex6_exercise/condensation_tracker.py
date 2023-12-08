@@ -130,9 +130,6 @@ def condensation_tracker(video_name, params):
     particles = np.tile(mean_state_a_priori[0], (params["num_particles"], 1))
     particles_w = np.ones([params["num_particles"], 1]) * 1./params["num_particles"]
 
-    print(f"Initial particles shape: {particles.shape}")
-    print(f"Initial particles_w shape: {particles_w.shape}")
-
     fig, ax = plt.subplots(1)
     im = ax.imshow(first_image)
     plt.ion()
@@ -244,16 +241,16 @@ def condensation_tracker(video_name, params):
 
 
 if __name__ == "__main__":
-    video_name = 'video3.avi'
+    video_name = 'video1.avi'
     params = {
         "draw_plots": 1,
-        "hist_bin": 16,
-        "alpha": 0,
-        "sigma_observe": 0.1,
+        "hist_bin": 64,
+        "alpha": 0.15,
+        "sigma_observe": 0.2,
         "model": 0,
-        "num_particles": 30,
-        "sigma_position": 15,
+        "num_particles": 50,
+        "sigma_position": 10,
         "sigma_velocity": 1,
-        "initial_velocity": (1, 10)
+        "initial_velocity": (2, 0)
     }
     condensation_tracker(video_name, params)

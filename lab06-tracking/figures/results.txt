@@ -1,0 +1,82 @@
+Video 2:
+params = {
+        "draw_plots": 1,
+        "hist_bin": 128,
+        "alpha": 0.1,
+        "sigma_observe": 0.1,
+        "model": 0,
+        "num_particles": 100,
+        "sigma_position": 15,
+        "sigma_velocity": 1,
+        "initial_velocity": (-3, -2)
+    }
+params = {
+        "draw_plots": 1,
+        "hist_bin": 16,
+        "alpha": 0,
+        "sigma_observe": 0.1,
+        "model": 0,
+        "num_particles": 30,
+        "sigma_position": 15,
+        "sigma_velocity": 1,
+        "initial_velocity": (2, 0)
+    }
+params = {
+        "draw_plots": 1,
+        "hist_bin": 16,
+        "alpha": 0,
+        "sigma_observe": 0.1,
+        "model": 1,
+        "num_particles": 30,
+        "sigma_position": 15,
+        "sigma_velocity": 1,
+        "initial_velocity": (2, 0)
+ }
+ params = {
+        "draw_plots": 1,
+        "hist_bin": 32,
+        "alpha": 0,
+        "sigma_observe": 0.1,
+        "model": 1,
+        "num_particles": 50,
+        "sigma_position": 15,
+        "sigma_velocity": 5,
+        "initial_velocity": (2, 0)
+}
+params = {
+        "draw_plots": 1,
+        "hist_bin": 32,
+        "alpha": 0,
+        "sigma_observe": 0.1,
+        "model": 1,
+        "num_particles": 50,
+        "sigma_position": 10,
+        "sigma_velocity": 1,
+        "initial_velocity": (2, 0)
+    }
+params = {
+        "draw_plots": 1,
+        "hist_bin": 64,
+        "alpha": 0,
+        "sigma_observe": 1,
+        "model": 1,
+        "num_particles": 50,
+        "sigma_position": 15,
+        "sigma_velocity": 1,
+        "initial_velocity": (2, 0)
+    }
+    
+    
+Video 3
+3: params = {
+        "draw_plots": 1,
+        "hist_bin": 64,
+        "alpha": 0.1,
+        "sigma_observe": 1,
+        "model": 1,
+        "num_particles": 50,
+        "sigma_position": 5,
+        "sigma_velocity": 3,
+        "initial_velocity": (2, 0)
+    }
+

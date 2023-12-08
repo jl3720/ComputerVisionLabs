@@ -23,29 +23,14 @@ def observe(particles, frame, bbox_height, bbox_width,
         y_end = int(particle[1] + bbox_height / 2)
 
         hist_roi = color_histogram(x, y, x_end, y_end, frame, hist_bin)
-        # print(f"hist_roi: {hist_roi.shape} {hist_roi}")
-        # print(f"hist: {hist.shape} {hist}")
-        
-        # import matplotlib.pyplot as plt
-        # plt.figure()
-        # plt.subplot(1, 2, 1)
-        # plt.bar(range(len(hist)), hist)
-        # plt.subplot(1, 2, 2)
-        # plt.bar(range(len(hist_roi)), hist_roi)
-        # plt.show()
         
         # Compute the chi2 distance between the particle histogram and the target histogram
         distance = chi2_cost(hist_roi, hist)
-        # print(f"distance: {distance}")
         
         # Compute the weight of the particle using the chi2 distance and sigma_observe
         weight = np.exp(-0.5 * (distance/sigma_observe)**2) / (np.sqrt(2*np.pi) * sigma_observe)
-        # print(f"weight: {weight}")
 
-        particles_w.append(weight)
-
-        # import pdb
-        # pdb.set_trace()
+        particles_w.append(weight+np.nextafter(0, 1))  # add epsilon to avoid zero weight
     
     particles_w = np.array(particles_w).reshape(-1, 1)
     

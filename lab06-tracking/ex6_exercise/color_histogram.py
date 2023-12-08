@@ -28,17 +28,6 @@ def color_histogram(xmin, ymin, xmax, ymax, frame, hist_bin):
     hist_r, _ = np.histogram(r, bins=hist_bin, range=(0, 256))
     hist_g, _ = np.histogram(g, bins=hist_bin, range=(0, 256))
     hist_b, _ = np.histogram(b, bins=hist_bin, range=(0, 256))
-    # hist_r = cv2.calcHist(roi_rgb, [0], None, [hist_bin], [0, 256])
-    # hist_g = cv2.calcHist(roi_rgb, [1], None, [hist_bin], [0, 256])
-    # hist_b = cv2.calcHist(roi_rgb, [2], None, [hist_bin], [0, 256])
-
-    if np.sum(hist_r) == 0 or np.sum(hist_g) == 0 or np.sum(hist_b) == 0:
-        print(f"hist_r: {hist_r}")
-        print(f"hist_g: {hist_g}")
-        print(f"hist_b: {hist_b}")
-        print(f"roi: {roi}")
-        print(f"frame: {frame}")
-        print(f"bbox: {(xmin, ymin, xmax, ymax)}")
 
     # Normalize the histograms
     hist_r = hist_r / np.sum(hist_r)
@@ -47,8 +36,6 @@ def color_histogram(xmin, ymin, xmax, ymax, frame, hist_bin):
 
     # Concatenate the histograms of all color channels
     hist = np.concatenate((hist_r, hist_g, hist_b))
-
-    # import pdb; pdb.set_trace(header="Check hist_r etc.")
 
     return hist.flatten()
     

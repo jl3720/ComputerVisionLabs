@@ -36,10 +36,6 @@ def propagate(particles, frame_height, frame_width, params):
     noise_velocity = np.random.normal(0, sigma_velocity, size=(num_particles, 2))
 
     # Propagate particles: s_t = As_{t-1} + w_{t-1}
-    # if params["model"] == 0:
-    #     propagated_particles = np.dot(A, particles.T).T + noise_position
-    # elif params["model"] == 1:
-    #     propagated_particles = np.dot(A, particles.T).T + np.hstack((noise_position, noise_velocity))
     if params["model"] == 0:
         propagated_particles = np.matmul(particles, A.T) + noise_position
     elif params["model"] == 1:

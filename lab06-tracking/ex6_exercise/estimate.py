@@ -17,5 +17,4 @@ def estimate(particles, particles_w: np.ndarray):
 
     weighted_particles = particles * particles_w
     mean_state = np.sum(weighted_particles, axis=0) / np.sum(particles_w)
-    print(f"mean state: {mean_state}")
     return mean_state
