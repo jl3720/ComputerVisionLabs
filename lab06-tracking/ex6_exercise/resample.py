@@ -8,7 +8,6 @@ def resample(particles, particles_w):
         resampled_particles: num_particles x 2 or num_particles x 4
         resampled_particles_w: num_particles x 1
     """
-    print(f"weights sum: {np.sum(particles_w)}")
     # Resample particles based on their weights
     resampled_particles = []
     resampled_particles_w = []

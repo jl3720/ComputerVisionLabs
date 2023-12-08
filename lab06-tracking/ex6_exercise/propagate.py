@@ -16,7 +16,6 @@ def propagate(particles, frame_height, frame_width, params):
     Returns:
         propagated_particles: num_particles x 2 or num_particles x 4
     """
-    print(f"particles initial shape: {particles.shape}")
     if params["model"] == 0:
         # No motion model
         A = np.eye(2)
@@ -40,8 +39,6 @@ def propagate(particles, frame_height, frame_width, params):
         propagated_particles = np.matmul(particles, A.T) + noise_position
     elif params["model"] == 1:
         propagated_particles = np.matmul(particles, A.T) + np.hstack((noise_position, noise_velocity))
-
-    print(f"particles propagated shape: {propagated_particles.shape}")
 
     # Ensure particles stay within the frame
     propagated_particles[:, 0] = np.clip(propagated_particles[:, 0], 0, frame_width - 1)
