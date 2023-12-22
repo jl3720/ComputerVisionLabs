@@ -52,7 +52,8 @@ def EstimateEssentialMatrix(K, im1, im2, matches):
   # The first two singular values need to be equal, the third one zero.
   # Since E is up to scale, we can choose the two equal singular values arbitrarily
   u, s, vh = np.linalg.svd(E_hat)
-  s[0] = s[1] = (s[0] + s[1]) / 2
+  # s[0] = s[1] = (s[0] + s[1]) / 2
+  s[0] = s[1] = 1
   s[2] = 0
   E = u @ np.diag(s) @ vh
 
@@ -62,12 +63,12 @@ def EstimateEssentialMatrix(K, im1, im2, matches):
   for i in range(matches.shape[0]):
     kp1 = normalized_kps1[i, :]
     kp2 = normalized_kps2[i, :]
-    # print("########################")
-    # print(abs(kp1 @ E @ kp2))
-    # print(abs(kp1.T @ E @ kp2))
-    # print(abs(kp2.T @ E @ kp1))
-    # print(abs(kp2 @ E @ kp1))
-    # print("----------------------")
+    print("########################")
+    print(abs(kp1 @ E @ kp2))
+    print(abs(kp1.T @ E @ kp2))
+    print(abs(kp2.T @ E @ kp1))
+    print(abs(kp2 @ E @ kp1))
+    print("----------------------")
     assert abs(kp2.T @ E @ kp1) < 0.01
 
   return E
