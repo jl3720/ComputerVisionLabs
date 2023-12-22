@@ -5,7 +5,8 @@ import numpy as np
 
 from impl.vis import Plot3DPoints
 from impl.sfm.corrs import Find2D3DCorrespondences, GetPairMatches, UpdateReconstructionState
-from impl.sfm.geometry import DecomposeEssentialMatrix, EstimateEssentialMatrix, TriangulatePoints, TriangulateImage, EstimateImagePose
+# from impl.sfm.geometry import DecomposeEssentialMatrix, TriangulatePoints, TriangulateImage, EstimateImagePose
+from impl.sfm.geometry import EstimateEssentialMatrix
 from impl.sfm.image import Image
 from impl.sfm.io import ReadFeatureMatches, ReadKMatrix
 from impl.sfm.vis import PlotImages, PlotWithKeypoints, PlotImagePairMatches, PlotCameras
@@ -46,16 +47,16 @@ def main():
   # You can comment these lines once you verified that the images are loaded correctly
 
   # Show the images
-  PlotImages(images)
+  # PlotImages(images)
 
-  # Show the keypoints
-  for image_name in image_names:
-    PlotWithKeypoints(images[image_name])
+  # # Show the keypoints
+  # for image_name in image_names:
+  #   PlotWithKeypoints(images[image_name])
 
-  # Show the feature matches
-  for image_pair in itertools.combinations(image_names, 2):
-    PlotImagePairMatches(images[image_pair[0]], images[image_pair[1]], matches[(image_pair[0], image_pair[1])])
-    gc.collect()
+  # # Show the feature matches
+  # for image_pair in itertools.combinations(image_names, 2):
+  #   PlotImagePairMatches(images[image_pair[0]], images[image_pair[1]], matches[(image_pair[0], image_pair[1])])
+  #   gc.collect()
   # ------------------------------------------------------------------------------------
   
   e_im1_name = image_names[init_images[0]]
